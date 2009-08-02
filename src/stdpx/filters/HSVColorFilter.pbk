@@ -1,0 +1,156 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2008-2009 Vincent Petithory - http://blog.lunar-dev.net/
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE. 
+///////////////////////////////////////////////////////////////////////////////
+
+<languageVersion : 1.0;>
+
+kernel HSVColorFilter
+<
+    namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+    vendor : "Vincent Petithory";
+    version : 1;
+    description : "A filter to adjust hue, saturation and value of an image";
+>
+{
+    input image4 src;
+    output pixel4 result;
+    
+    parameter float hue
+    <
+        defaultValue:   0.0;
+        minValue:       -180.0;
+        maxValue:       180.0;
+        description: "The variation of hue";
+    >;
+    
+    parameter float saturation
+    <
+        defaultValue:   0.0;
+        minValue:       -100.0;
+        maxValue:       100.0;
+        description: "The variation of saturation";
+    >;
+    
+    parameter float value
+    <
+        defaultValue:   0.0;
+        minValue:       -100.0;
+        maxValue:       100.0;
+        description: "The variation of value";
+    >;
+
+    void evaluatePixel()
+    {
+        // Declare pixel variables
+        pixel4 rgbIn = sampleNearest(src,outCoord());
+        float3 hsvPx;
+        
+        //------- start converting input RGB to HSV
+        float min = min(min(rgbIn.r, rgbIn.g), rgbIn.b);
+        float max = max(max(rgbIn.r, rgbIn.g), rgbIn.b);
+        float delta = max - min;
+        
+        
+        if (delta == 0.0)
+        {
+            hsvPx.xy = float2(0.0);
+        }
+        else
+        {
+            hsvPx.y = delta/max;
+            
+            float3 dRGB = float3((max - rgbIn.r)/(6.0*delta) + 0.5, 
+                                 (max - rgbIn.g)/(6.0*delta) + 0.5, 
+                                 (max - rgbIn.b)/(6.0*delta) + 0.5
+                                 );
+            if (rgbIn.r == max)
+                hsvPx.x = dRGB.b - dRGB.g;
+            else if (rgbIn.g == max)
+                hsvPx.x = 1.0/3.0 + dRGB.r - dRGB.b;
+            else if (rgbIn.b == max)
+                hsvPx.x = 2.0/3.0 + dRGB.g - dRGB.r;
+            
+            if (hsvPx.x < 0.0)
+                hsvPx.x += 1.0;
+			else if (hsvPx.x > 1.0)
+                hsvPx.x -= 1.0;
+                
+        }
+        hsvPx.z = max;
+        
+        //------- start modifying HSV sample with parameters
+        
+        // First, normalize values to [0, 1]. 
+        float3 dhsv = float3(
+                            hue/360.0, 
+                            saturation/100.0, 
+                            value/100.0
+                            );
+        hsvPx += dhsv;
+        if (hsvPx.x < 0.0)
+                hsvPx.x += 1.0;
+		else if (hsvPx.x > 1.0)
+			hsvPx.x -= 1.0;
+        
+        hsvPx.yz = clamp(hsvPx.yz, float2(0.0, 0.0), float2(1.0, 1.0));
+        
+        //------- now bring back HSV to RGB
+        
+		pixel4 rgbPxOut;
+        
+        if (hsvPx.y == 0.0)
+        {
+            rgbPxOut.xyz = hsvPx.zzz;
+        }
+        else
+        {
+            float vH = hsvPx.x*6.0;
+            if (vH == 6.0)
+                vH = 0.0;
+            
+            float vfH = floor(vH);
+            float3 vi = float3(
+                                hsvPx.z*(1.0 - hsvPx.y), 
+                                hsvPx.z*(1.0 - hsvPx.y*(vH - vfH)), 
+                                hsvPx.z*(1.0 - hsvPx.y*(1.0 - (vH - vfH)))
+                                );
+            
+            if (vfH == 0.0)
+                rgbPxOut.xyz = float3(hsvPx.z, vi.z, vi.x);
+            else if (vfH == 1.0)
+                rgbPxOut.xyz = float3(vi.y, hsvPx.z, vi.x);
+            else if (vfH == 2.0)
+                rgbPxOut.xyz = float3(vi.x, hsvPx.z, vi.z);
+            else if (vfH == 3.0)
+                rgbPxOut.xyz = float3(vi.x, vi.y, hsvPx.z);
+            else if (vfH == 4.0)
+                rgbPxOut.xyz = float3(vi.z, vi.x, hsvPx.z);
+            else // ( vfH == 5.0 and there is no other cases
+                rgbPxOut.xyz = float3(hsvPx.z, vi.x, vi.y);
+            
+        }
+        rgbPxOut.w = rgbIn.w;
+        
+        // Assign to result
+        result = rgbPxOut;
+        
+    }
+}

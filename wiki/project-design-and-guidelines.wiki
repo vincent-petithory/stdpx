@@ -1,0 +1,18 @@
+#summary Setting up a project using stdpx
+#labels Featured,Phase-Design
+
+The STDPX library is divided into four sub parts : 
+  # ===Blend modes===
+Located in the `stdpx.blendmodes` package, you will find shaders that merge two images between them.
+  # ===Filters===
+Located in the `stdpx.filters` package, you will find shaders that create various effects on an image.
+  # ===Fills===
+Located in the `stdpx.fills` package, you will find shaders to use for filling an area of your application. Actually, most of those fills are designed to draw the colors of a color space like RGB,CMYK,HSV,HSL,CIE L*ab.
+  # ===Jobs===
+Located in the `stdpx.jobs` package, you will find shaders that generate batches of numbers from an input. Actually, most of them generate 24-bit RGB colors from inputs of several color spaces.
+  
+There are two additional parts : 
+  # ===Utilities===
+Located in the `stdpx.util` package, it contains classes that might help you using shaders.
+  # ===Types===
+Located in the `stdpx.types` package, many of the available classes are used internally by all other parts of the library. Some of them are nevertheless necessary for specific classes, like the `ChannelTransform` class for the `ChannelMixerFilter`.

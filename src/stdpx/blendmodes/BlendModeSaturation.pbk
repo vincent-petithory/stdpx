@@ -1,0 +1,194 @@
+///////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2008-2009 Vincent Petithory - http://blog.lunar-dev.net/
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE. 
+///////////////////////////////////////////////////////////////////////////////
+
+<languageVersion : 1.0;>
+
+kernel BlendModeSaturation
+<   namespace : "http://www.lunar-dev.net/2009/stdpx/blendmodes";
+    vendor : "Vincent Petithory";
+    version : 1;
+    description : "Merges two images using the Saturation blend mode.";
+>
+{
+    
+
+    input image4 background;
+    input image4 blendImage;
+    
+    output pixel4 result;
+
+
+    //#define R_LUM  0.3086
+    //#define G_LUM  0.6094
+    //#define B_LUM  0.0820
+    
+    //#define R_LUM  0.30
+    //#define G_LUM  0.59
+    //#define B_LUM  0.11
+
+    void evaluatePixel()
+    {
+        // Get the hue and lightness of the background image
+        pixel4 rgbBg = sampleNearest(background, outCoord());
+        if (rgbBg.a>0.0)
+        {
+            rgbBg.rgb /= rgbBg.a;
+        }
+       
+        
+        float minBg = min(min(rgbBg.r, rgbBg.g), rgbBg.b);
+        float maxBg = max(max(rgbBg.r, rgbBg.g), rgbBg.b);
+        float deltaBg = maxBg - minBg;
+        //float lumBg = R_LUM*rgbBg.r+G_LUM*rgbBg.g+B_LUM*rgbBg.b;
+        float lumBg = (minBg+maxBg)*0.5;
+        float hueBg = 0.0;
+        
+        if (deltaBg == 0.0)
+        {
+            hueBg = 0.0;
+        }
+        else
+        {
+            float SixDeltaInverse = 1.0/(6.0*deltaBg);
+            float drgbBgConst = maxBg*SixDeltaInverse + 0.5;
+            
+            float3 drgbBg = float3(
+                                    drgbBgConst - rgbBg.r*SixDeltaInverse, 
+                                    drgbBgConst - rgbBg.g*SixDeltaInverse, 
+                                    drgbBgConst - rgbBg.b*SixDeltaInverse 
+                                );
+            if (rgbBg.r == maxBg)
+                hueBg = drgbBg.b - drgbBg.g;
+            else if (rgbBg.g == maxBg)
+                hueBg = 1.0/3.0 + drgbBg.r - drgbBg.b;
+            else if (rgbBg.b == maxBg)
+                hueBg = 2.0/3.0 + drgbBg.g - drgbBg.r;
+            
+                
+            if (hueBg < 0.0)
+                hueBg += 1.0;
+			else if (hueBg > 1.0)
+                hueBg -= 1.0;
+        }
+        
+        // Get the saturation from the blend image
+        pixel4 rgbBi = sampleNearest(blendImage, outCoord());
+        if (rgbBi.a>0.0)
+        {
+            rgbBi.rgb /= rgbBi.a;
+        }
+        float minBi = min(min(rgbBi.r, rgbBi.g), rgbBi.b);
+        float maxBi = max(max(rgbBi.r, rgbBi.g), rgbBi.b);
+        float deltaBi = maxBi - minBi;
+        
+        float satBi = 0.0;
+        
+        if (deltaBi == 0.0)
+        {
+            satBi = 0.0;
+        }
+        else
+        {
+            //float lumBi = R_LUM*rgbBi.r+G_LUM*rgbBi.g+B_LUM*rgbBi.b;
+            float lumBi = (maxBi + minBi)*0.5;
+            if (lumBi < 0.5)
+                satBi = deltaBi/(maxBi + minBi);
+            else
+                satBi = deltaBi/((1.0 - maxBi) + (1.0 - minBi));
+                
+            
+        }
+        
+        // Create a HSL-space color with combined 
+        // hue, saturation and lightness of input images
+        float3 hslOut = float3(hueBg, satBi, lumBg*rgbBg.a);
+        
+        // Convert HSL color to RGB color
+        pixel3 rgbOut = pixel3(0.0, 0.0, 0.0);
+        
+        if (hslOut.y == 0.0)
+        {
+            rgbOut.rgb = hslOut.zzz;
+        }
+        else
+        {
+            float vLS2;
+            if (hslOut.z < 0.5)
+                vLS2 = hslOut.z*(1.0 + hslOut.y);
+            else
+                vLS2 = hslOut.y + hslOut.z - hslOut.y*hslOut.z;
+                
+                
+            float vLS1 = 2.0*hslOut.z - vLS2;
+            
+            float3 vH = float3(hslOut.x + 1.0/3.0, hslOut.x, hslOut.x - 1.0/3.0);
+            
+            if (vH.x < 0.0)
+                vH.x += 1.0;
+			else if (vH.x > 1.0)
+                vH.x -= 1.0;
+                
+            if (vH.y < 0.0)
+                vH.y += 1.0;
+			else if (vH.y > 1.0)
+                vH.y -= 1.0;
+                
+            if (vH.z < 0.0)
+                vH.z += 1.0;
+			else if (vH.z > 1.0)
+                vH.z -= 1.0;
+            
+            float3 vHCross6 = 6.0*vH;
+            
+            if (vHCross6.x < 1.0)
+                rgbOut.r = vLS1 + (vLS2 - vLS1)*vHCross6.x;
+            else if (vHCross6.x < 3.0)
+                rgbOut.r = vLS2;
+            else if (vHCross6.x < 4.0)
+                rgbOut.r = vLS1 + (vLS2 - vLS1)*(4.0 - vHCross6.x);
+            else
+                rgbOut.r = vLS1;
+            
+            if (vHCross6.y < 1.0)
+                rgbOut.g = vLS1 + (vLS2 - vLS1)*vHCross6.y;
+            else if (vHCross6.y < 3.0)
+                rgbOut.g = vLS2;
+            else if (vHCross6.y < 4.0)
+                rgbOut.g = vLS1 + (vLS2 - vLS1)*(4.0 - vHCross6.y);
+            else
+                rgbOut.g = vLS1;
+            
+            if (vHCross6.z < 1.0)
+                rgbOut.b = vLS1 + (vLS2 - vLS1)*vHCross6.z;
+            else if (vHCross6.z < 3.0)
+                rgbOut.b = vLS2;
+            else if (vHCross6.z < 4.0)
+                rgbOut.b = vLS1 + (vLS2 - vLS1)*(4.0 - vHCross6.z);
+            else
+                rgbOut.b = vLS1;
+            
+        }
+        
+        result.rgb = rgbOut*rgbBi.a+rgbBg.rgb*(1.0-rgbBi.a);
+        result.a = 1.0;
+    }
+}

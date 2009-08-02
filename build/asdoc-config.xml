@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<flex-config>
+	
+	<packages>
+		<!--<package>
+			<string>stdpx</string>
+			<string><![CDATA[The stdpx package contains base classes of the API.]]></string>
+		</package>-->
+		<package>
+			<string>stdpx.blendmodes</string>
+			<string><![CDATA[The <code class="prettyprint">stdpx.blendmodes</code> package contains blend modes.]]></string>
+		</package>
+		<package>
+			<string>stdpx.fills</string>
+			<string><![CDATA[The <code class="prettyprint">stdpx.fills</code> package contains fills to be used with <code class="prettyprint">Graphics.beginShaderFill()</code>.]]></string>
+		</package>
+		<package>
+			<string>stdpx.filters</string>
+			<string><![CDATA[The <code class="prettyprint">stdpx.filters</code> package contains filters.]]></string>
+		</package>
+		<package>
+			<string>stdpx.jobs</string>
+			<string><![CDATA[The <code class="prettyprint">stdpx.jobs</code> package contains jobs.]]></string>
+		</package>
+		<package>
+			<string>stdpx.types</string>
+			<string><![CDATA[The <code class="prettyprint">stdpx.types</code> package contains structural classes of the API, usually used internally and/or exposed to the API user by composition.]]></string>
+		</package>
+		<package>
+			<string>stdpx.util</string>
+			<string><![CDATA[The <code class="prettyprint">stdpx.util</code> package contains utility classes.]]></string>
+		</package>
+	</packages>
+	
+</flex-config>

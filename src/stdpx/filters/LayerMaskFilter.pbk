@@ -1,0 +1,27 @@
+<languageVersion : 1.0;>
+
+kernel LayerMaskFilter
+<   namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+    vendor : "Vincent Petithory";
+    version : 1;
+    description : "Applies a layer mask on the input image.";
+>
+{
+
+    #define R_LUM  0.3086
+    #define G_LUM  0.6094
+    #define B_LUM  0.0820
+
+    input image4 src;
+    input image4 mask;
+    output pixel4 result;
+
+    void evaluatePixel()
+    {
+        pixel4 inputPx = sampleNearest(src,outCoord());
+        pixel4 mergeMaskPx = sampleNearest(mask, outCoord());
+        
+        float lum = mergeMaskPx.r*R_LUM + mergeMaskPx.g*G_LUM + mergeMaskPx.b*B_LUM;
+        result = inputPx*lum;
+    }
+}

@@ -1,0 +1,92 @@
+<languageVersion : 1.0;>
+
+kernel LightFilter
+<   namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+    vendor : "Vincent Petithory";
+    version : 3;
+    description : "A filter that creates an omni light source";
+>
+{
+    input image4 src;
+    output pixel4 result;
+    
+    parameter float exposition
+    <
+        minValue:float(-1.0);
+        maxValue:float(1.0);
+        defaultValue:float(0.0);
+        description: "The global exposition of the image";
+    >;
+    
+    parameter float2 lightposition
+    <
+    
+        minValue: float2(-8192.0,-8192.0);
+        maxValue: float2(8192.0,8192.0);
+        defaultValue: float2(0.0,0.0);
+        description: "The position of the light source";
+    >;
+    
+    parameter float2 range
+    <
+        minValue: float2(1.0,1.0);
+        maxValue: float2(8192.0,8192.0);
+        defaultValue: float2(640.0,480.0);
+        description: "The range of the light source";
+    >;
+    
+    parameter float attenuation
+    <
+        minValue: 0.0001;
+        maxValue: 20.0;
+        defaultValue: 0.0001;
+        description: "The attenuation of the light source";
+    >;
+    
+    parameter pixel3 lightcolor
+    <
+        minValue: pixel3(0.0);
+        maxValue: pixel3(1.0);
+        defaultValue: pixel3(1.0);
+        description: "The color of the light source";
+    >;
+    
+    parameter float intensity
+    <
+        minValue: 0.0;
+        maxValue: 1.0;
+        defaultValue: 0.0;
+        description: "The color intensity of the light source";
+    >;
+    
+    parameter float lighting
+    <
+        minValue: 0.01;
+        maxValue: 5.0;
+        defaultValue: 1.0;
+        description: "The strength of the light source";
+    >;
+    
+    parameter float globalillumination
+    <
+        minValue: 0.0;
+        maxValue: 10.0;
+        defaultValue: 0.0;
+        description: "The global ambient lighting of the image";
+    >;
+    
+    void evaluatePixel()
+    {
+        float2 oc = outCoord();
+        pixel4 pxin = sampleNearest(src,oc);
+        
+        
+        float l = distance(lightposition,oc)/distance(range,float2(0.0));
+        float r = 1.0-pow(l,1.0/attenuation);
+        
+        pixel3 px = pxin.rgb*globalillumination + pxin.rgb*pow(r,1.0/lighting) + r*lightcolor.rgb*intensity;
+        //result.rgb = pxin.rgb*globalillumination + pxin.rgb*pow(r,1.0/lighting) + r*lightcolor.rgb*intensity;
+        result.rgb = pow(px, float3(1.0 - exposition));
+        result.a = pxin.a;
+    }
+}

@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project name="stdpx" default="c" basedir=".">
+    
+	<!-- Properties -->
+	
+	<property file="${basedir}/build/build.properties" />
+	<taskdef file="${basedir}/build/flexc.tasks" classpath="${basedir}/build/flexc.jar" />
+	
+	<!-- Master tasks -->
+	
+	<target 
+		name="c.lab" 
+		depends="" 
+		description="Compiles lab test class"
+	>
+		<mxmlc failonerror="true">
+			<arg value="-target-player=10" />
+			<arg value="-sp ${project.src}" />
+			<arg value="-debug=true" />
+			<arg value="-library-path+=${project.root}\lab\dependancies" />
+			<arg value="-file-specs ${project.root}\lab\FilterTest.as" />
+		</mxmlc>
+	</target>
+	
+	<target 
+		name="c" 
+		depends="c.kernels, c.swc, c.asdoc"
+		description="Creates the whole library" 
+	/>
+	
+	<target 
+		name="clean" 
+		depends="clean.kernels, clean.swc"
+		description="Cleans all" 
+	/>
+	
+	<!-- kernels -->
+	
+	<target name="clean.kernels">
+		<delete>
+			<fileset dir="${project.kernels}" includes="**/*.pbj" />
+		</delete>
+	</target>
+	
+	<target name="c.kernels" depends="clean.kernels">
+		<property name="pixelbender.compiler" value="./build/pixelbender/pbutil.exe" />
+		<pixelbender failonerror="true" compiler="${pixelbender.compiler}">
+			<fileset dir="${project.kernels}" includes="**/*.pbk" />
+		</pixelbender>
+	</target>
+	
+	<!-- swc -->
+	
+	<target name="clean.swc">
+		<delete>
+			<fileset dir="${lib.output.dir}" includes="**/*.swc" />
+		</delete>
+	</target>
+	
+	<target name="c.swc" depends="clean.swc, timestamp, build.new, build.get">
+		<mkdir dir="${lib.output.dir}" />
+		
+		<loadresource property="project.out">
+			<propertyresource name="project.out.pattern" />
+			<filterchain>
+				<replacetokens>
+					<token key="BUILD" value="${project.build.number}"/>
+				</replacetokens>
+			</filterchain>
+		</loadresource>
+		
+		<compc failonerror="true">
+			<arg value="-debug=true"/>
+			<arg value="-title ${project.metadata.title} " />
+			<arg value="-description ${project.metadata.description}" />
+			<arg value="-publisher ${project.metadata.publisher}" />
+			<arg value="-creator ${project.metadata.creator}" />
+			<arg value="-date ${project.metadata.date}" />
+			<arg value="-language ${project.metadata.language}" /> 
+			<arg value="-sp ${project.src}" />
+			<arg value="-is ${project.sources}" />
+			<arg value="-ic ${project.classes}" />
+			<arg value="-target-player=10" />
+			<arg value="-o ${project.out}" />
+		</compc>
+		<copy file="${project.root}/License.txt" toDir="${lib.output.dir}" />
+    </target>
+	
+	<!-- asdoc -->
+	
+	<target name="clean.asdoc">
+		<delete dir="${asdoc.dir}" />
+		<delete>
+			<fileset dir="${lib.output.dir}" includes="**/*.zip" />
+		</delete>
+    </target>
+	
+	<target name="c.asdoc" depends="clean.asdoc, timestamp, build.get">
+		<mkdir dir="${asdoc.dir}" />
+		
+		<asdoc failonerror="true">
+			<arg value="-main-title=${asdoc.title.main}" />
+			<arg value="-window-title=${asdoc.title.window}" />
+			<arg value="-footer=${asdoc.title.footer}" />
+			<arg value="-title ${asdoc.metadata.title} " />
+			<arg value="-description ${asdoc.metadata.description}" />
+			<arg value="-publisher ${asdoc.metadata.publisher}" />
+			<arg value="-creator ${asdoc.metadata.creator}" />
+			<arg value="-date ${asdoc.metadata.date}" />
+			<arg value="-language ${asdoc.metadata.language}" />
+			<arg value="-templates-path ${asdoc.templatespath}" />
+			<arg value="-load-config+=${asdoc.config}" />
+			<arg value="-sp ${project.src}" />
+			<arg value="-target-player=10" />
+			<arg value="-doc-sources ${asdoc.sources}" />
+			<arg value="-doc-classes ${asdoc.classes}" />
+			<arg value="-o ${asdoc.dir}" />
+		</asdoc>
+		
+		<!-- zip -->
+		<loadresource property="asdoc.archive">
+			<propertyresource name="asdoc.archive.pattern" />
+			<filterchain>
+				<replacetokens>
+					<token key="BUILD" value="${project.build.number}"/>
+				</replacetokens>
+			</filterchain>
+		</loadresource>
+		<zip destfile="${asdoc.archive}" basedir="${asdoc.dir}" />
+    </target>
+	
+	<target name="build.new">
+		<buildnumber file="${project.build.file}" />
+	</target>
+	
+	<target name="build.get">
+		<property file="${project.build.file}" prefix="project" />
+	</target>
+	
+	<target name="timestamp" unless="timestamp.done">
+		<property name="timestamp.done" value="true" />
+		<tstamp>
+			<format property="project.metadata.date" pattern="dd/MM/yyyy" locale="en,UK"/>
+			<format property="asdoc.metadata.date" pattern="dd/MM/yyyy" locale="en,UK"/>
+		</tstamp>
+	</target>
+	
+</project>
