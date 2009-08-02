@@ -104,7 +104,7 @@ public class NoiseFilter extends ShaderFilter implements IMetadataAttachedShader
 	 */
 	override public function clone():BitmapFilter
 	{
-		return new NoiseFilter();
+		return new NoiseFilter(seed,amount);
 	}
 	
 }

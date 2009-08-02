@@ -9,20 +9,6 @@
 	<!-- Master tasks -->
 	
 	<target 
-		name="c.lab" 
-		depends="" 
-		description="Compiles lab test class"
-	>
-		<mxmlc failonerror="true">
-			<arg value="-target-player=10" />
-			<arg value="-sp ${project.src}" />
-			<arg value="-debug=true" />
-			<arg value="-library-path+=${project.root}\lab\dependancies" />
-			<arg value="-file-specs ${project.root}\lab\FilterTest.as" />
-		</mxmlc>
-	</target>
-	
-	<target 
 		name="c" 
 		depends="c.kernels, c.swc, c.asdoc"
 		description="Creates the whole library" 
