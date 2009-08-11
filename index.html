@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+	<title>lunar-dev/stdpx @ GitHub</title>
+	
+	<style type="text/css">
+		body {
+  		margin-top: 1.0em;
+  		background-color: #d67af8;
+		  font-family: "helvetica"; 
+  		color: #000000;
+    }
+    #container {
+      margin: 0 auto;
+      width: 700px;
+    }
+		h1 { font-size: 3.8em; color: #298507; margin-bottom: 3px; }
+		h1 .small { font-size: 0.4em; }
+		h1 a { text-decoration: none }
+		h2 { font-size: 1.5em; color: #298507; }
+    h3 { text-align: center; color: #298507; }
+    a { color: #298507; }
+    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+    .download { float: right; }
+		pre { background: #000; color: #fff; padding: 15px;}
+    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+    .footer { text-align:center; padding-top:30px; font-style: italic; }
+	</style>
+	
+</head>
+
+<body>
+  <a href="http://github.com/lunar-dev/stdpx"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+  
+  <div id="container">
+
+    <div class="download">
+      <a href="http://github.com/lunar-dev/stdpx/zipball/master">
+        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
+      <a href="http://github.com/lunar-dev/stdpx/tarball/master">
+        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
+    </div>
+      
+    <h1><a href="http://github.com/lunar-dev/stdpx">stdpx</a> 
+      <span class="small">by <a href="http://github.com/lunar-dev">lunar-dev</a></span></h1>
+
+    <div class="description">
+      A standard library of pixel bender kernels for Flash Player 10
+    </div>
+
+    <p>This project is meant to be a standard library of pixel bender kernels. Filters, blendmodes and jobs are available.
+
+Many of those kernels are tightly linked to color manipulation. They benefit of a good knowledge of color theory and color spaces, which guarantee compatible behaviors with common image manipulation softwares.
+
+For example, all written blendmodes behaves like the ones of Photoshop, especially those involving color spaces conversions.
+
+Feel free to join the project to add your own contribution.
+
+= Guidelines of the project =
+
+  * _"You ain't gonna need it"_ . A quote taken from eXtreme Programming that fits well with the way this library was built : you will find filters/blend modes/jobs that are or have been used in production. There is no place for kernels you will never have a chance to use.
+  * *Strict compatibility with color theory :* Kernels' code was adjusted to fit exactly the standard behavior of color spaces. 
+  * *Standard blend modes :* Many blend modes are standard and their behavior is defined. Those standards were followed.
+  * *Performance :* You don't want your application to use too much cpu cycles for simply rendering blend modes, filters or run shader jobs.
+
+= Roadmap =
+
+  * Write documentation
+  * Wiki pages
+    * Getting started with fills
+    * Getting started with jobs
+  * ~~Fix blend mode `Dissolve` (working in Pixel Bender, not Flash)~~ Available as a filter.
+  * Sample application for browsing available blend modes/filters
+
+= What you will find in this project =
+
+== 1. Blend modes ==
+=== Well-known blend modes not found in flash player === 
+
+  # Color Burn
+  # Color Dodge
+  # Linear Burn
+  # Linear Dodge
+  # Linear Light 
+  # Pin Light
+  # Vivid Light
+  # Soft Light
+  # Darker Color
+  # Lighter Color
+  # Hard Mix
+  # Exclusion
+  # Color
+  # Hue
+  # Saturation
+  # Luminosity
+
+=== Additionnal blend modes ===
+
+  # Average
+  # Invert Average
+  # Inclusion
+  # Negation
+  # See Through
+  # Luma
+
+=== Blend modes already in Flash Player ===
+
+  # Add
+  # Alpha
+  # Darken
+  # Difference
+  # Erase
+  # Hard Light
+  # Lighten
+  # Multiply
+  # Normal
+  # Overlay
+  # Screen 
+  # Subtract
+
+== 2. Filters == 
+
+  # Layer Mask (works the same as Photoshop layer mask feature)
+  # Channel (disable RGBA channels)
+  # Channel Mixer (mix channels between them, which allows color balance adjustments)
+  # Contrast/Lightness (adjust lightness and contrast)
+  # Dissolve (adds noisy pixels around transparent areas)
+  # EdgeDetection (turns the image into black and reveals the outline in white)
+  # Gamma (change the gamma of the image)
+  # Grayscale (turns an image into grayscale using luminances)
+  # HSVColor (Allows hue, saturation and value adjustments -- just like the Hue/Saturation tool of Photoshop)
+  # Lighting (creates an omni light source in the image)
+  # Negative (inverts the colors of an image)
+  # Noise (adds noise on the image)
+  # Rasterize (increases pixel sizes)
+  # Scatter (make the pixels noisy)
+  # WebColor (restricts the color palette to web colors)
+  # ZoomLinear (zooms at a target point of the image and applies a basic interpolation)
+
+== 3. Fills == 
+
+  # Fills for RGB color space
+  # Fills for HSV color space
+  # Fills for HSL color space
+  # Fills for CIE L*C*H° color space
+
+
+== 4. Jobs == 
+
+  # HSLColorJob (generates a batch of colors in the HSL color space)
+  # HSVColorJob (generates a batch of colors in the HSV color space)
+  
+= References =
+Many of the blend modes and filters formulas did not come out from nowhere. Many of them, especially the standard ones mentioned earlier, can be found in Adobe Photoshop Help (or at least a good description instead of the formula, which is sufficient).</p><h2>Dependencies</h2>
+<p>None</p>
+<h2>Install</h2>
+<p>#summary Setting up a project using stdpx
+
+The *STDPX* library is gathered into a single SWC file. Each major upgrade of the library leads to a new SWC available in the downloads section.
+To use the library in an Actionscript based project, you simply have to include this file to your project sources.
+
+  * If you use an IDE, add the file in the project sources or library path. 
+    * In Flex Builder, this is typically the default _libs_ directory. 
+    * In Flash CS4, you can add the SWC or the folder containing the SWC with Library Path tab of the _File->Publish Settings->Flash->Settings_ menu.
+  * If you use the command-line compilers, you may include the SWC file using one of the following commands :
+    * -library-path
+    * -include-libraries
+
+You can also download the sources of the library and use them in your project. You may choose the sources from the _tags_ folder for a stable version, or use the trunk folder for the version in development.</p>
+<h2>License</h2>
+<p>Copyright (c) 2008-2009 Vincent Petithory - http://blog.lunar-dev.net/
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE. </p>
+<h2>Authors</h2>
+<p> (vincent.petithory@gmail.com)<br/>      </p>
+<h2>Contact</h2>
+<p> (vincent.petithory@gmail.com)<br/>      </p>
+
+
+    <h2>Download</h2>
+    <p>
+      You can download this project in either
+      <a href="http://github.com/lunar-dev/stdpx/zipball/master">zip</a> or
+      <a href="http://github.com/lunar-dev/stdpx/tarball/master">tar</a> formats.
+    </p>
+    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+      by running:
+      <pre>$ git clone git://github.com/lunar-dev/stdpx</pre>
+    </p>
+      
+    <div class="footer">
+      get the source code on GitHub : <a href="http://github.com/lunar-dev/stdpx">lunar-dev/stdpx</a>
+    </div>
+    
+  </div>
+
+  <script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-7173909-3");
+pageTracker._trackPageview();
+} catch(err) {}</script>
+</body>
+</html>
