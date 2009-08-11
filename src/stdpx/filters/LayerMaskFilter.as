@@ -60,7 +60,7 @@ public class LayerMaskFilter extends ShaderFilter implements IMetadataAttachedSh
 	 * 
 	 * @param mask The mask to apply.
 	 */
-	public function LayerMaskFilter(mask:BitmapData) 
+	public function LayerMaskFilter(mask:BitmapData = null) 
 	{
 		super();
 		this.shader = new Shader(new ShaderByteCode());
@@ -88,8 +88,11 @@ public class LayerMaskFilter extends ShaderFilter implements IMetadataAttachedSh
 	 */
 	public function set mask(value:BitmapData):void
 	{
-		this._mask = value.clone();
-		this.shader.data.mask.input = _mask;
+		if (value)
+		{
+			this._mask = value.clone();
+			this.shader.data.mask.input = _mask;
+		}
 	}
 	
 	/**

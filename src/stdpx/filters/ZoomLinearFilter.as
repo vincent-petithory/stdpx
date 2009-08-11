@@ -73,7 +73,8 @@ public class ZoomLinearFilter extends ShaderFilter implements IMetadataAttachedS
 	 */
 	public function set refPoint(value:Point):void
 	{
-		this.shader.data.ref.value = [value.x,value.y];
+		if (value)
+			this.shader.data.ref.value = [value.x,value.y];
 	}
 	
 	/**
