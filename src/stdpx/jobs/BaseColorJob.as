@@ -35,11 +35,7 @@ package stdpx.jobs
 
 [Event(name="complete", type="flash.events.Event")]
 [Event(name="cancel", type="flash.events.Event")]
-
-/**
- * This is the base class of all Pixel Bender jobs that produce 
- * colors in a given color space.
- */
+	
 public class BaseColorJob extends EventDispatcher 
 {
 	
@@ -48,20 +44,8 @@ public class BaseColorJob extends EventDispatcher
 	 */
 	protected var $shader:Shader;
 	
-	/**
-	 * The number of channels (or components) of 
-	 * the output color space.
-	 */
 	protected var $numChannels:uint;
 	
-	/**
-	 * Constructor.
-	 * 
-	 * @param code the byte code of the shader that 
-	 * will perform the calculation.
-	 * @param numChannels The number of channels (or components) of 
-	 * the output color space.
-	 */
 	public function BaseColorJob(code:ByteArray, numChannels:uint) 
 	{
 		super();
@@ -69,15 +53,6 @@ public class BaseColorJob extends EventDispatcher
 		this.$numChannels = numChannels;
 	}
 	
-	/**
-	 * The bytearray containing 
-	 * the values of the color space components.
-	 * The provided byte array endian must be little endian.
-	 * 
-	 * To produce one output color, the bytearray must contain as much values as 
-	 * the number of components of the output color space.
-	 * You may use the writeFloat() method to add values to the byte array.
-	 */
 	public function set byteArray(value:ByteArray):void
 	{
 		if (value.endian != Endian.LITTLE_ENDIAN)
@@ -95,13 +70,6 @@ public class BaseColorJob extends EventDispatcher
 		$vector = null;
 	}
 	
-	/**
-	 * The vector containing 
-	 * the values of the color space components.
-	 * 
-	 * To produce one output color, the vector must contain as much values as 
-	 * the number of components of the output color space.
-	 */
 	public function set vector(value:Vector.<Number>):void
 	{
 		var l:int = value.length;
@@ -118,32 +86,12 @@ public class BaseColorJob extends EventDispatcher
 		$byteArray = null;
 	}
 	
-	/**
-	 * The internal shader job.
-	 */
 	protected var $job:ShaderJob;
-	
-	/**
-	 * The internal byte array of output values.
-	 * It will contain the result if the input is a byte array.
-	 */
 	protected var $byteArray:ByteArray;
-	
-	/**
-	 * The internal vector of output values.
-	 * It will contain the result if the input is a vector.
-	 */
 	protected var $vector:Vector.<Number>;
 	
-	/**
-	 * @private
-	 */
 	private var colors:Vector.<uint>;
 	
-	/**
-	 * Returns the colors calculated by this job.
-	 * @return the colors calculated by this job.
-	 */
 	public function getColors():Vector.<uint>
 	{
 		if (!colors)
@@ -189,11 +137,6 @@ public class BaseColorJob extends EventDispatcher
 		return colors;
 	}
 	
-	/**
-	 * Cancels the current calculation.
-	 * Dispatches a Event.CANCEL event if 
-	 * there was a calculation to cancel.
-	 */
 	public function cancel():void
 	{
 		if ($job)
@@ -203,24 +146,15 @@ public class BaseColorJob extends EventDispatcher
 		}
 	}
 	
-	/**
-	 * Starts a new calculation.
-	 * @param waitForCompletion whether the operation is synchronous or asynchronous.
-	 * if <code class="prettyprint">true</code>, it is synchronous. 
-	 * Otherwise, it is asynchronous and will dispatch a Event.COMPLETE event when completed.
-	 */
 	public function start(waitForCompletion:Boolean = false):void
 	{
+		
 		$job = new ShaderJob($shader,$byteArray ? $byteArray : $vector,$shader.data.src.width,1);
 		if (!waitForCompletion) $job.addEventListener(ShaderEvent.COMPLETE, $onShaderComplete);
 		$job.start(waitForCompletion);
 	}
 	
-	/**
-	 * Called when an asynchronous calculation is completed.
-	 * @param event The event object related to the completion event.
-	 */
-	protected function $onShaderComplete(event:ShaderEvent):void 
+	protected function $onShaderComplete(e:ShaderEvent):void 
 	{
 		$job.removeEventListener(ShaderEvent.COMPLETE, $onShaderComplete);
 		this.dispatchEvent(new Event(Event.COMPLETE, false, false));

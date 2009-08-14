@@ -23,21 +23,13 @@
 package stdpx.filters 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	
 	import flash.display.Shader;
 	import flash.display.ShaderData;
 	
 	import flash.filters.BitmapFilter;
 	import flash.filters.ShaderFilter;
 
-/**
- * The NegativeFilter gives the negative of an image.
- * 
- * <p>The intensity parameter allows to create a 
- * transition between the normal and the inverted image.</p>
- */
-public class NegativeFilter extends ShaderFilter implements IMetadataAttachedShader 
+public class NegativeFilter extends ShaderFilter 
 {
 	
 	/**
@@ -48,25 +40,76 @@ public class NegativeFilter extends ShaderFilter implements IMetadataAttachedSha
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	public static function get minIntensity():Number
+	{
+		return shaderData.intensity.minValue[0];
+	}
+	
+	public static function get maxIntensity():Number
+	{
+		return shaderData.intensity.maxValue[0];
+	}
+	
+	public static function get defaultIntensity():Number
+	{
+		return shaderData.intensity.defaultValue[0];
+	}
+	
+	/**
+	 * @private
+	 */
+	private static var _shaderData:ShaderData;
+	
+	/**
+	 * @private
+	 */
+	private static function get shaderData():ShaderData
+	{
+		if (!_shaderData)
+		{
+			_shaderData = new Shader(new ShaderByteCode()).data;
+		}
+		return _shaderData;
+	}
+	
+	/**
+	 * @private
+	 * A reference to the internal shader.
+	 */
+	private var _shader:Shader;
 	
 	/**
 	 * Constructor.
-	 * 
-	 * @param intensity The strength of the negative effect. 
 	 */
 	public function NegativeFilter(intensity:Number = 1) 
 	{
 		super();
-		this.shader = new Shader(new ShaderByteCode());
+		_shader = new Shader(new ShaderByteCode());
 		this.intensity = intensity;
+		this.shader = _shader;
 	}
 	
 	/**
-	 * The strength of the negative effect. 
-	 * <p>A value equal to 1 does the default negative effect; 
-	 * a value equal to 0 does nothing; 
-	 * a value between 0 and 1 makes a transition.</p>
+	 * Increases or decreases the filtered image lightness. 
+	 * <p>Valid values ar between <code class="prettyprint">-100</code> 
+	 * and <code class="prettyprint">100</code>.</p>
 	 */
 	public function get intensity():Number
 	{
@@ -78,13 +121,10 @@ public class NegativeFilter extends ShaderFilter implements IMetadataAttachedSha
 	 */
 	public function set intensity(value:Number):void
 	{
-		this.shader.data.intensity.value[0] = value;
+		_shader.data.intensity.value[0] = Math.max(minIntensity,Math.min(value,maxIntensity));
+		this.shader = _shader;
 	}
 	
-	/**
-	 * Returns a clone of this filter.
-	 * @return a clone of this filter.
-	 */
 	override public function clone():BitmapFilter
 	{
 		return new NegativeFilter(intensity);

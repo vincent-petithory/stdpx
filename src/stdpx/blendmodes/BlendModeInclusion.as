@@ -23,19 +23,31 @@
 package stdpx.blendmodes 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	import stdpx.types.IShader;
-	
 	import flash.display.Shader;
 
-public class BlendModeInclusion extends Shader implements IMetadataAttachedShader, IShader 
+public class BlendModeInclusion extends Shader 
 {
 	
 	[Embed(source="BlendModeInclusion.pbj", 
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
 	
 	public function BlendModeInclusion() 
 	{
@@ -43,29 +55,11 @@ public class BlendModeInclusion extends Shader implements IMetadataAttachedShade
 		this.byteCode = new ShaderByteCode();
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
 	public function clone():Shader
 	{
 		return new BlendModeInclusion();
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
-	public function valueOf():Shader
-	{
-		return this;
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public function toString():String
-	{
-		return "[BlendMode Inclusion]";
-	}
 	
 }
 	

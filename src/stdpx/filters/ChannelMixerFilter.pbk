@@ -23,7 +23,7 @@
 <languageVersion : 1.0;>
 
 kernel ChannelMixerFilter 
-<   namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+<   namespace : "http://blog.lunar-dev.net::Filters";
     vendor : "Vincent Petithory";
     version : 1;
     description : "Mixes color channels between them to change the colors.";
@@ -37,20 +37,20 @@ kernel ChannelMixerFilter
         defaultValue:   float4(0.0, 0.0, 0.0, 0.0);
         minValue:       float4(-1.0, -1.0, -1.0, -1.0);
         maxValue:       float4(1.0, 1.0, 1.0, 1.0);
-        description: "An array of 4 values to offset the RGBA channels.";
     >;
     
-    parameter float4x4 combination
+    parameter float4x4 rgbaModifier
     <
         defaultValue: float4x4(1.0,0.0,0.0,0.0, 0.0,1.0,0.0,0.0, 0.0,0.0,1.0,0.0, 0.0,0.0,0.0,1.0);
         minValue:     float4x4(-1.0,-1.0,-1.0,-1.0, -1.0,-1.0,-1.0,-1.0, -1.0,-1.0,-1.0,-1.0, -1.0,-1.0,-1.0,-1.0);
-        maxValue:     float4x4(1.0,1.0,1.0,1.0, 1.0,1.0,1.0,1.0, 1.0,1.0,1.0,1.0, 1.0,1.0,1.0,1.0);
-        description: "An array of 16 values to combine the RGBA channels.";
+        maxValue:     float4x4(99.0,99.0,99.0,99.0, 99.0,99.0,99.0,99.0, 99.0,99.0,99.0,99.0, 99.0,99.0,99.0,99.0);
+    
     >;
+    
     
     void evaluatePixel()
     {
-        result = combination*sampleNearest(src,outCoord())+offset;
+        result = rgbaModifier*sampleNearest(src,outCoord())+offset;
     }
     
     

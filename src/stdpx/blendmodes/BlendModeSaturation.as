@@ -22,20 +22,50 @@
 
 package stdpx.blendmodes 
 {
+
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	import stdpx.types.IShader;
-	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.display.BlendMode;
+	import flash.display.DisplayObject;
 	import flash.display.Shader;
+	import flash.geom.Matrix;
 	
-public class BlendModeSaturation extends Shader implements IMetadataAttachedShader, IShader  
+public class BlendModeSaturation extends Shader  
 {
+	
+	//------------------------------
+	//
+	// Class members
+	//
+	//------------------------------
 	
 	[Embed(source="BlendModeSaturation.pbj", 
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	//------------------------------
+	//
+	// Constructor
+	//
+	//------------------------------
 	
 	/**
 	 * 
@@ -46,29 +76,11 @@ public class BlendModeSaturation extends Shader implements IMetadataAttachedShad
 		this.byteCode = new ShaderByteCode();
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
 	public function clone():Shader
 	{
 		return new BlendModeSaturation();
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
-	public function valueOf():Shader
-	{
-		return this;
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public function toString():String
-	{
-		return "[BlendMode Saturation]";
-	}
 	
 }
 	

@@ -22,55 +22,52 @@
 
 <languageVersion : 1.0;>
 
-kernel NoiseFilter
+kernel BlendModeDissolve
 <   
-    namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+    namespace : "http://blog.lunar-dev.net::BlendModes";
     vendor : "Vincent Petithory";
     version : 1;
-    description : "Applies a noise on an image.";
+    description : "Merges two images using the Dissolve blend mode.";
 >
 {
-    input image4 src;
-    output pixel4 dst;
+    input image4 background;
+    input image4 blender;
+    output pixel4 pxout;
     
-    #define A 16807.0
-    #define C 0.0
-    #define M 2147483647.0
-    
-    parameter float seed
+    parameter float randomSeed
     <
-        minValue: 1.0;
-        maxValue: 255.0;
-        defaultValue: 127.0;
-        description: "A value changing the noise generation";
+        maxValue : 1.0;
+        minValue : 0.0;
+        defaultValue : 0.5;
     >;
     
-    parameter float amount
-    <
-        minValue: 0.001;
-        maxValue: 4.0;
-        defaultValue: 0.01;
-        description: "The amount of noise in the image";
-    >;
-    
+    // Edits or paints each pixel to make it the result color. 
+    // However, the result color is a random replacement of the pixels with the base color or the blend color, 
+    // depending on the opacity at any pixel location. 
     void evaluatePixel()
     {
-        float2 oc = outCoord();
+        float2 uc = outCoord();
+        pixel4 pxbg = sampleNearest(background,uc);
+        pixel4 pxbl = sampleNearest(blender,uc);
         
-        float r = seed*((oc.x+oc.y)+oc.x*oc.y);
-        float t = mod(A*r + C, M);
-        t = mod(A*t + C, M);
-        t = mod(A*t + C, M);
-        t = mod(A*t + C, M);
+        float div = 2147483647.0;
+        float dende = 1103515245.0;
         
-        float l = t/M;
+        float random = floor(dende*100.0*((uc.x*uc.x+uc.y*uc.y-2.0*uc.x*uc.y)*(1.0+randomSeed))-div*floor((dende*((uc.x*uc.x+uc.y*uc.y-0.5*uc.x*uc.y)*(1.0))/div)))/div;
+
+        float reference = abs(cos(random));
         
-        pixel3 randompx = 2.0*pixel3(l)-pixel3(1.0);
-        dst = sampleNearest(src,oc);
+        pxout.rgb = pxbl.rgb;
         
-        randompx = floor(randompx*5.0+float3(0.5))*0.2;
+        float alpha = pxbl.a;
         
-        dst.rgb += (0.25*amount*amount)*randompx;
+        if (reference>alpha)
+        {
+            pxout.rgb = pxbg.rgb;
+        }
+        
+        pxout.a = pxbg.a;
+        
         
     }
 }

@@ -24,10 +24,9 @@ package stdpx.filters
 {
 	
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	
 	import flash.display.Shader;
-	
+	import flash.display.ShaderData;
+	import flash.display.ShaderParameter;
 	import flash.filters.BitmapFilter;
 	import flash.filters.ShaderFilter;
 
@@ -35,14 +34,6 @@ package stdpx.filters
  * The <code class="prettyprint">ContrastLightnessFilter</code> class allows 
  * filtering display objects by adjusting their lightness and contrast. 
  * It behaves like Photoshop's Lightness/Contrast adjustement.
- * 
- * <p>The lightness defines the global amount of white in an image. 
- * High values will lead to images with lots of white/light areas and 
- * low values will lead to images with lots of black/dark areas.</p>
- * 
- * <p>The contrast defines the chromatic gap between pixels in a image.
- * Low values will lead to gray and dull images, while high values will 
- * lead to over-saturated images.</p>
  * 
  * <p>You may use this class as an usual filter class : </p>
  * <pre class="prettyprint">
@@ -57,7 +48,7 @@ package stdpx.filters
  * </pre>
  * 
  */
-public class ContrastLightnessFilter extends ShaderFilter implements IMetadataAttachedShader 
+public class ContrastLightnessFilter extends ShaderFilter
 {
 	
 	/**
@@ -68,7 +59,113 @@ public class ContrastLightnessFilter extends ShaderFilter implements IMetadataAt
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	/**
+	 * The minimum lightness defined in the shader source.
+	 * 
+	 * <p>You may change it to allow lesser values to all 
+	 * <code class="prettyprint">ContrastLightnessFilter</code> objects</p>
+	 */
+	public static function get minLightness():int
+	{
+		return shaderData.lightness.minValue[0];
+	}
+	
+	/**
+	 * The maximum lightness defined in the shader source.
+	 * 
+	 * <p>You may change it to allow higher values to all 
+	 * <code class="prettyprint">ContrastLightnessFilter</code> objects</p>
+	 */
+	public static function get maxLightness():int
+	{
+		return shaderData.lightness.maxValue[0];
+	}
+	
+	/**
+	 * The default lightness defined in the shader source.
+	 * 
+	 * <p>It is not automatically applied as default values of this 
+	 * <code class="prettyprint">ContrastLightnessFilter</code> filter. 
+	 * If this value is passed, it will remain the input image unchanged.</p>
+	 */
+	public static function get defaultLightness():int
+	{
+		return shaderData.lightness.defaultValue[0];
+	}
+	
+	/**
+	 * The minimum contast defined in the shader source.
+	 * 
+	 * <p>You may change it to allow lesser values to all 
+	 * <code class="prettyprint">ContrastLightnessFilter</code> objects</p>
+	 */
+	public static function get minContrast():int
+	{
+		return shaderData.contrast.minValue[0];
+	}
+	
+	/**
+	 * The maximum contrast defined in the shader source.
+	 * 
+	 * <p>You may change it to allow higher values to all 
+	 * <code class="prettyprint">ContrastLightnessFilter</code> objects</p>
+	 */
+	public static function get maxContrast():int
+	{
+		return shaderData.contrast.maxValue[0];
+	}
+	
+	/**
+	 * The default contrast defined in the shader source.
+	 * 
+	 * <p>It is not automatically applied as default values of this 
+	 * <code class="prettyprint">ContrastLightnessFilter</code> filter. 
+	 * If this value is passed, it will remain the input image unchanged.</p>
+	 */
+	public static function get defaultContrast():int
+	{
+		return shaderData.contrast.defaultValue[0];
+	}
+	
+	/**
+	 * @private
+	 */
+	private static var _shaderData:ShaderData;
+	
+	/**
+	 * @private
+	 */
+	private static function get shaderData():ShaderData
+	{
+		if (!_shaderData)
+		{
+			_shaderData = new Shader(new ShaderByteCode()).data;
+		}
+		return _shaderData;
+	}
+	
+	/**
+	 * @private
+	 * A reference to the internal shader.
+	 */
+	private var _shader:Shader;
 	
 	/**
 	 * Constructor.
@@ -86,9 +183,10 @@ public class ContrastLightnessFilter extends ShaderFilter implements IMetadataAt
 											) 
 	{
 		super();
-		this.shader = new Shader(new ShaderByteCode());
+		_shader = new Shader(new ShaderByteCode());
 		this.contrast = contrast;
 		this.lightness = lightness;
+		this.shader = _shader;
 	}
 	
 	/**
@@ -106,7 +204,8 @@ public class ContrastLightnessFilter extends ShaderFilter implements IMetadataAt
 	 */
 	public function set lightness(value:int):void
 	{
-		this.shader.data.lightness.value[0] = value;
+		_shader.data.lightness.value[0] = Math.max(minLightness,Math.min(value,maxLightness));
+		this.shader = _shader;
 	}
 	
 	/**
@@ -124,13 +223,10 @@ public class ContrastLightnessFilter extends ShaderFilter implements IMetadataAt
 	 */
 	public function set contrast(value:int):void
 	{
-		this.shader.data.contrast.value[0] = value;
+		_shader.data.contrast.value[0] = Math.max(minContrast,Math.min(value,maxContrast));
+		this.shader = _shader;
 	}
 	
-	/**
-	 * Returns a clone of this filter.
-	 * @return a clone of this filter.
-	 */
 	override public function clone():BitmapFilter
 	{
 		return new ContrastLightnessFilter(contrast, lightness);

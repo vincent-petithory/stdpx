@@ -23,7 +23,7 @@
 <languageVersion : 1.0;>
 
 kernel NegativeFilter
-<   namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+<   namespace : "http://blog.lunar-dev.net::Filters";
     vendor : "Vincent Petithory";
     version : 1;
     description : "A filter that gives the negative of the image";
@@ -31,20 +31,21 @@ kernel NegativeFilter
 {
     input image4 src;
     
+    // can be used to create a transition 
+    // between normal and negative image
     parameter float intensity
     <
         minValue: 0.0;
         maxValue: 1.0;
         defaultValue: 1.0;
-        description: "The intensity of the negative effect";
     >;
     output pixel4 result;
 
     void evaluatePixel()
     {
-        pixel4 pxin = sampleNearest(src,outCoord());
+        
         result.rgb = float3(intensity, intensity, intensity) + 
-                  (1.0 - 2.0*intensity)*pxin.rgb;
-        result.a = pxin.a;
+                  (1.0 - 2.0*intensity)*sampleNearest(src,outCoord()).rgb;
+        result.a = 1.0;
     }
 }

@@ -23,19 +23,31 @@
 package stdpx.blendmodes 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	import stdpx.types.IShader;
-	
 	import flash.display.Shader;
 
-public class BlendModeInvertAverage extends Shader implements IMetadataAttachedShader, IShader 
+public class BlendModeInvertAverage extends Shader 
 {
 	
 	[Embed(source="BlendModeInvertAverage.pbj", 
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
 	
 	public function BlendModeInvertAverage() 
 	{
@@ -43,29 +55,11 @@ public class BlendModeInvertAverage extends Shader implements IMetadataAttachedS
 		this.byteCode = new ShaderByteCode();
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
 	public function clone():Shader
 	{
 		return new BlendModeInvertAverage();
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
-	public function valueOf():Shader
-	{
-		return this;
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public function toString():String
-	{
-		return "[BlendMode InvertAverage]";
-	}
 	
 }
 	

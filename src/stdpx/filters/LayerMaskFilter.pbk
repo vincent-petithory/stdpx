@@ -1,10 +1,10 @@
 <languageVersion : 1.0;>
 
 kernel LayerMaskFilter
-<   namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+<   namespace : "http://blog.lunar-dev.net::Filters";
     vendor : "Vincent Petithory";
     version : 1;
-    description : "Applies a layer mask on the input image.";
+    description : "Applies a merge mask on the input image";
 >
 {
 
@@ -13,15 +13,21 @@ kernel LayerMaskFilter
     #define B_LUM  0.0820
 
     input image4 src;
-    input image4 mask;
+    input image4 mergeMask;
     output pixel4 result;
 
     void evaluatePixel()
     {
         pixel4 inputPx = sampleNearest(src,outCoord());
-        pixel4 mergeMaskPx = sampleNearest(mask, outCoord());
+        pixel4 mergeMaskPx = sampleNearest(mergeMask, outCoord());
         
+        // 3 ways to keep the good values 
+            // using luminances : 
         float lum = mergeMaskPx.r*R_LUM + mergeMaskPx.g*G_LUM + mergeMaskPx.b*B_LUM;
+            // using lightness of HSL color model
+        //float lum = (max(max(mergeMaskPx.r, mergeMaskPx.g), mergeMaskPx.b) + min(min(mergeMaskPx.r, mergeMaskPx.g), mergeMaskPx.b))*0.5;
+            // using value of HSV color model
+        //float lum = max(max(mergeMaskPx.r, mergeMaskPx.g), mergeMaskPx.b);
         result = inputPx*lum;
     }
 }

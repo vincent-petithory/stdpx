@@ -23,7 +23,7 @@
 <languageVersion : 1.0;>
 
 kernel GrayscaleFilter
-<   namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+<   namespace : "http://blog.lunar-dev.net::Filters";
     vendor : "Vincent Petithory";
     version : 1;
     description : "A filter that turns an image to grayscale";
@@ -32,12 +32,12 @@ kernel GrayscaleFilter
     input image4 src;
     output pixel4 result;
     
+    // can be used to create a transition 
     parameter float intensity
     <
         minValue: 0.0;
         maxValue: 1.0;
         defaultValue: 1.0;
-        description: "The intensity of the grayscale effect";
     >;
     
     
@@ -47,10 +47,9 @@ kernel GrayscaleFilter
     
     void evaluatePixel()
     {
-        pixel4 pxin = sampleNearest(src,outCoord());
-        
+        pixel3 pxin = sampleNearest(src,outCoord()).rgb;
         
         result.rgb = pixel3(R_LUM*pxin.r+G_LUM*pxin.g+B_LUM*pxin.b)*intensity + (1.0-intensity)*pxin.rgb;
-        result.a = pxin.a;
+        result.a = 1.0;
     }
 }

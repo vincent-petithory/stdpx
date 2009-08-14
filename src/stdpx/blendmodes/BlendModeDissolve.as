@@ -20,27 +20,56 @@
 // THE SOFTWARE. 
 ///////////////////////////////////////////////////////////////////////////////
 
-package stdpx.types 
+package stdpx.blendmodes 
 {
+	import stdpx.types.ShaderMetadata;
+	import flash.display.Shader;
 
 /**
- * The <code class="prettyprint">IShaderFill</code> 
- * interface defines shader fills that expose the default size the shader uses to 
- * draw them. Use theses sizes with the <code class="prettyprint">matrix</code> 
- * parameter of the <code class="prettyprint">Graphics.beginShaderFill()</code> to 
- * draw a fill of the desired size.
+ * 
+ * Not yet working. (Pixel bender ok, not flash)
+ * 
  */
-public interface IShaderFill extends IShader 
+public class BlendModeDissolve extends Shader 
 {
-	/**
-	 * The width of the shader fill.
-	 */
-	function get fillWidth():Number;
+	
+	[Embed(source="BlendModeDissolve.pbj", 
+			mimeType="application/octet-stream")]
+	private static var ShaderByteCode:Class;
 	
 	/**
-	 * The height of the shader fill.
+	 * @private
 	 */
-	function get fillHeight():Number;
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	private var seed:Number;
+	
+	public function BlendModeDissolve() 
+	{
+		super();
+		this.byteCode = new ShaderByteCode();
+		this.data.randomSeed.value[0] = seed = Math.random();
+	}
+	
+	public function clone():Shader
+	{
+		var bmd:BlendModeDissolve = new BlendModeDissolve();
+		bmd.seed = seed;
+		return bmd;
+	}
+	
 	
 }
 	

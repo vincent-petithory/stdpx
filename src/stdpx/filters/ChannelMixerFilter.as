@@ -23,23 +23,17 @@
 package stdpx.filters 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
 	import stdpx.types.ChannelTransform;
 	
 	import flash.display.Shader;
+	import flash.display.ShaderData;
 	
-	import flash.filters.BitmapFilter;
 	import flash.filters.ShaderFilter;
+	
+	import flash.geom.Matrix3D;
+	import flash.geom.Vector3D;
 
-/**
- * The ChannelMixerFilter allows you to mix RGBA channels of an image.
- * Using a ChannelTransform object, you can swap channels between them, 
- * apply offsets or make a more sophisticated linear combination of all channels.
- * 
- * <p>Alternatively, you may pass a raw array of numbers for the combination of channels and the offsets, to configure the channel mixing.
- * To know how to organize those arrays, see the ChannelTransform class : their raw arrays work the same.</p>
- */
-public class ChannelMixerFilter extends ShaderFilter implements IMetadataAttachedShader 
+public class ChannelMixerFilter extends ShaderFilter 
 {
 	
 	/**
@@ -50,68 +44,62 @@ public class ChannelMixerFilter extends ShaderFilter implements IMetadataAttache
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
 	
 	/**
-	 * Constructor.
-	 * 
-	 * @param transform a ChannelTransform object that will mix the channels
+	 * The metadata of the shader
 	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	/**
+	 * @private
+	 */
+	private static var _shaderData:ShaderData;
+	
+	/**
+	 * @private
+	 */
+	private static function get shaderData():ShaderData
+	{
+		if (!shaderData)
+		{
+			_shaderData = new Shader(new ShaderByteCode()).data;
+		}
+		return shaderData;
+	}
+	
+	private var _transform:ChannelTransform;
+	
 	public function ChannelMixerFilter(
 				transform:ChannelTransform = null
 			) 
 	{
 		super();
 		this.shader = new Shader(new ShaderByteCode());
-		this.transform = transform ? transform : new ChannelTransform();	
-	}
-	
-	/**
-	 * @private
-	 */
-	private var _transform:ChannelTransform;
-	
-	/**
-	 * A ChannelTransform object that will mix the channels.
-	 */
-	public function get transform():ChannelTransform
-	{
-		return _transform;
-	}
-	
-	/**
-	 * @private
-	 */
-	public function set transform(value:ChannelTransform):void
-	{
-		this._transform = value.clone();
-		this.shader.data.combination.value = _transform.rawChannelData;
+		this._transform = transform ? transform : new ChannelTransform();	
+		
+		this.shader.data.rgbaModifier.value = _transform.rawChannelData;
 		this.shader.data.offset.value = _transform.rawOffsetData;
 	}
 	
-	/**
-	 * An array of 16 numbers to mix the channels.
-	 */
-	public function set combination(value:Array):void
+	public function set transform(value:ChannelTransform):void
 	{
-		this.shader.data.combination.value = value.slice(0,16);
+		this._transform = value.clone();
 	}
 	
-	/**
-	 * An array of 4 numbers to offset the channels.
-	 */
-	public function set offset(value:Array):void
+	public function get transform():ChannelTransform
 	{
-		this.shader.data.offset.value = value.slice(0,4);
-	}
-	
-	/**
-	 * Returns a clone of this filter.
-	 * @return a clone of this filter.
-	 */
-	override public function clone():BitmapFilter
-	{
-		return new ChannelMixerFilter(_transform);
+		return _transform;
 	}
 	
 }

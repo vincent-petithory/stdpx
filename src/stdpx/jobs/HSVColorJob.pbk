@@ -23,7 +23,7 @@
 <languageVersion : 1.0;>
 
 kernel HSVColorJob
-<   namespace : "http://www.lunar-dev.net/2009/stdpx/jobs";
+<   namespace : "http://blog.lunar-dev.net::Jobs";
     vendor : "Vincent Petithory";
     version : 1;
     description : "Creates a 4-channel color in the HSV space";

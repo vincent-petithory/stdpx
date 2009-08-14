@@ -23,7 +23,7 @@
 <languageVersion : 1.0;>
 
 kernel ChannelFilter
-<   namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+<   namespace : "http://blog.lunar-dev.net::Filters";
     vendor : "Vincent Petithory";
     version : 1;
     description : "A simple filter to select the channel to keep in an image.";
@@ -34,10 +34,9 @@ kernel ChannelFilter
     
     parameter float4 channels
     <
-        defaultValue: float4(1.0);
-        minValue: float4(0.0);
-        maxValue: float4(1.0);
-        description: "An array of 4 values (RGBA) to quantify each channel.";
+        defaultValue: float4(1.0, 1.0, 1.0, 1.0);
+        minValue: float4(0.0, 0.0, 0.0, 0.0);
+        maxValue: float4(1.0, 1.0, 1.0, 1.0);
     >;
 
     void evaluatePixel()

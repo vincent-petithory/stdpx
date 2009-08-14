@@ -24,7 +24,7 @@
 
 kernel BlendModeLinearBurn
 <   
-    namespace : "http://www.lunar-dev.net/2009/stdpx/blendmodes";
+    namespace : "http://blog.lunar-dev.net::BlendModes";
     vendor : "Vincent Petithory";
     version : 1;
     description : "Merges two images using the Linear Burn blend mode.Same as Color Burn but descreases lightness instead of contrast";

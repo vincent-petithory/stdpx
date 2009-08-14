@@ -25,92 +25,82 @@ package stdpx.util
 
 	import flash.display.DisplayObject;
 	import flash.filters.BitmapFilter;
-	import flash.filters.ShaderFilter;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
 	
-/**
- * The <code class="prettyprint">FilterUtil</code> class defines methods 
- * to manipulate filters applied to any <code class="prettyprint">DisplayObject</code>.
- */
-public final class FilterUtil 
-{
-	
-	/**
-	* Removes duplicate filter types in the filters array of a display object.
-	* Filters that extends ShaderFilter are not processed 
-	* (since Flash Player does not keep the real type of a filter that extends ShaderFilter)
-	* 
-	* @param filter The filter to search for duplicates.
-	* @param displayObject The DisplayObject which may own such a filter.
-	* @return The array of filters of the specified DisplayObject 
-	* with all duplicates of the specified filter removed.
-	*/
-	public static function removeDuplicates(filter:BitmapFilter, displayObject:DisplayObject):Array
+	public final class FilterUtil 
 	{
-		var removedSome:Boolean = false;
-		var filters:Array = displayObject.filters;
-		try 
+		
+		/**
+		* Removes duplicate filter types in the filters array of a display object.
+		* Filters that extends ShaderFilter are not processed 
+		* (since Flash Player does not keep the real type of a filter that extends ShaderFilter)
+		*/
+		public static function removeDuplicates(filter:BitmapFilter, displayObject:DisplayObject):Array
 		{
-			var qfn:String = getQualifiedClassName(filter);
-			var FilterType:Class = getDefinitionByName(qfn) as Class;
-			if (qfn == getQualifiedClassName(ShaderFilter))
+			var removedSome:Boolean = false;
+			var filters:Array = displayObject.filters;
+			try 
+			{
+				var FilterType:Class = getDefinitionByName(getQualifiedClassName(filter)) as Class;
+				var n:int = filters.length;
+				
+				while (--n>-1)
+				{
+					if (filters[n] is FilterType)
+					{
+						filters.pop();
+					}
+				}
+			} catch (e:ReferenceError)
+			{
+				throw e;
+			} 
+			catch (e:Error)
+			{
+				
+			}
+			finally 
 			{
 				return filters;
 			}
-			var n:int = filters.length;
-			
-			while (--n>-1)
+		}
+		
+		public static function push(filter:BitmapFilter, displayObject:DisplayObject):void
+		{
+			var filters:Array = removeDuplicates(filter,displayObject);
+			filters.push(filter);
+			displayObject.filters = filters;
+		}
+		
+		public static function unshift(filter:BitmapFilter, displayObject:DisplayObject):void
+		{
+			var filters:Array = displayObject.filters;
+			try 
 			{
-				if (filters[n] is FilterType)
+				var FilterType:Class = getDefinitionByName(getQualifiedClassName(filter)) as Class;
+				var n:int = filters.length;
+				while (--n>-1)
 				{
-					filters.pop();
+					if (filters[n] is FilterType)
+					{
+						filters.pop();
+					}
 				}
+			} catch (e:ReferenceError)
+			{
+				
+			} catch (e:Error)
+			{
+				
 			}
-		} catch (e:ReferenceError)
-		{
-			throw e;
-		} 
-		catch (e:Error)
-		{
-			
+			finally
+			{
+				filters.push(filter);
+				displayObject.filters = filters;
+			}
 		}
-		finally 
-		{
-			return filters;
-		}
+		
 	}
-	
-	/**
-	* Adds the specified filter to the filters applied to the specified displayObject. 
-	* The filter is added at the end of the filter array, so it is applied after all others filters.
-	* This operation is not performed if the specified filter will be a duplicate.
-	* 
-	* @param filter the filter to add.
-	* @param displayObject the DisplayObject that may receive the specified filter.
-	*/
-	public static function push(filter:BitmapFilter, displayObject:DisplayObject):void
-	{
-		var filters:Array = removeDuplicates(filter,displayObject);
-		filters.push(filter);
-		displayObject.filters = filters;
-	}
-	
-	/**
-	* Adds the specified filter to the filters applied to the specified displayObject.
-	* The filter is added at the beginning of the filter array, so it is applied after all others filters.
-	* This operation is not performed if the specified filter will be a duplicate.
-	* 
-	* @param filter the filter to add.
-	* @param displayObject the DisplayObject that may receive the specified filter.
-	*/
-	public static function unshift(filter:BitmapFilter, displayObject:DisplayObject):void
-	{
-		var filters:Array = removeDuplicates(filter,displayObject);
-		filters.unshift(filter);
-		displayObject.filters = filters;
-	}
-	
-}
 
 }

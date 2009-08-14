@@ -23,21 +23,13 @@
 package stdpx.filters 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	
 	import flash.display.Shader;
+	import flash.display.ShaderData;
 	
 	import flash.filters.BitmapFilter;
 	import flash.filters.ShaderFilter;
 
-/**
- * The ChannelFilter allows you to keep or dismiss RGBA channels of an image.
- * If you want a better control of channels mixing, use the stdpx.filters.ChannelMixelFilter.
- * 
- * @see ChannelMixelFilter
- * 
- */
-public class ChannelFilter extends ShaderFilter implements IMetadataAttachedShader 
+public class ChannelFilter extends ShaderFilter 
 {
 	
 	/**
@@ -48,16 +40,47 @@ public class ChannelFilter extends ShaderFilter implements IMetadataAttachedShad
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
 	
 	/**
-	 * Constructor.
-	 * 
-	 * @param keepRed The red channel state. 
-	 * @param keepGreen The green channel state. 
-	 * @param keepBlue The blue channel state. 
-	 * @param keepAlpha The alpha channel state. 
+	 * @private
 	 */
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	/**
+	 * @private
+	 */
+	private static var _shaderData:ShaderData;
+	
+	/**
+	 * @private
+	 */
+	private static function get shaderData():ShaderData
+	{
+		if (!_shaderData)
+		{
+			_shaderData = new Shader(new ShaderByteCode()).data;
+		}
+		return _shaderData;
+	}
+	
+	/**
+	 * @private
+	 * A reference to the internal shader.
+	 */
+	private var _shader:Shader;
+	
 	public function ChannelFilter(
 								keepRed:Boolean = true, 
 								keepGreen:Boolean = true, 
@@ -66,95 +89,54 @@ public class ChannelFilter extends ShaderFilter implements IMetadataAttachedShad
 							) 
 	{
 		super();
-		this.shader = new Shader(new ShaderByteCode());
+		_shader = new Shader(new ShaderByteCode());
 		this.keepRed = keepRed;
 		this.keepGreen = keepGreen;
 		this.keepBlue = keepBlue;
 		this.keepAlpha = keepAlpha;
+		this.shader = _shader;
 	}
 	
-	/**
-	 * The state of the RGBA channels. Pass an array of four values of either 0 or 1.
-	 * 0 will dismiss the corresponding channel.
-	 * 1 will keep the corresponding channel.
-	 */
-	public function set channels(value:Array):void
-	{
-		this.shader.data.channels.value = value.slice(0,4);
-	}
-	
-	/**
-	 * The red channel state. 
-	 * If true, it is kept. if false, it is dismissed.
-	 */
 	public function get keepRed():Boolean
 	{
-		return this.shader.data.channels.value[0] == 1;
+		return this._shader.data.channels.value[0] == 1;
 	}
 	
-	/**
-	 * @private
-	 */
 	public function set keepRed(value:Boolean):void
 	{
-		this.shader.data.channels.value[0] = value ? 1 : 0;
+		this._shader.data.channels.value[0] = value ? 1 : 0;
 	}
 	
-	/**
-	 * The green channel state. 
-	 * If true, it is kept. if false, it is dismissed.
-	 */
 	public function get keepGreen():Boolean
 	{
-		return this.shader.data.channels.value[1] == 1;
+		return this._shader.data.channels.value[1] == 1;
 	}
 	
-	/**
-	 * @private
-	 */
 	public function set keepGreen(value:Boolean):void
 	{
-		this.shader.data.channels.value[1] = value ? 1 : 0;
+		this._shader.data.channels.value[1] = value ? 1 : 0;
 	}
 	
-	/**
-	 * The blue channel state. 
-	 * If true, it is kept. if false, it is dismissed.
-	 */
 	public function get keepBlue():Boolean
 	{
-		return this.shader.data.channels.value[2] == 1;
+		return this._shader.data.channels.value[2] == 1;
 	}
 	
-	/**
-	 * @private
-	 */
 	public function set keepBlue(value:Boolean):void
 	{
-		this.shader.data.channels.value[2] = value ? 1 : 0;
+		this._shader.data.channels.value[2] = value ? 1 : 0;
 	}
 	
-	/**
-	 * The alpha channel state. 
-	 * If true, it is kept. if false, it is dismissed.
-	 */
 	public function get keepAlpha():Boolean
 	{
-		return this.shader.data.channels.value[3] == 1;
+		return this._shader.data.channels.value[3] == 1;
 	}
 	
-	/**
-	 * @private
-	 */
 	public function set keepAlpha(value:Boolean):void
 	{
-		this.shader.data.channels.value[3] = value ? 1 : 0;
+		this._shader.data.channels.value[3] = value ? 1 : 0;
 	}
 	
-	/**
-	 * Returns a clone of this filter.
-	 * @return a clone of this filter.
-	 */
 	override public function clone():BitmapFilter
 	{
 		return new ChannelFilter(keepRed,keepGreen,keepBlue,keepAlpha);

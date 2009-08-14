@@ -23,19 +23,31 @@
 package stdpx.blendmodes 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	import stdpx.types.IShader;
-	
 	import flash.display.Shader;
 
-public class BlendModeLighterColor extends Shader implements IMetadataAttachedShader, IShader 
+public class BlendModeLighterColor extends Shader 
 {
 	
 	[Embed(source="BlendModeLighterColor.pbj", 
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
 	
 	public function BlendModeLighterColor() 
 	{
@@ -43,29 +55,11 @@ public class BlendModeLighterColor extends Shader implements IMetadataAttachedSh
 		this.byteCode = new ShaderByteCode();
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
 	public function clone():Shader
 	{
 		return new BlendModeLighterColor();
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
-	public function valueOf():Shader
-	{
-		return this;
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	public function toString():String
-	{
-		return "[BlendMode LighterColor]";
-	}
 	
 }
 	

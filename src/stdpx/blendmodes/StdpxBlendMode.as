@@ -68,6 +68,15 @@ public final class StdpxBlendMode
 	}
 	
 	/**
+	 * FIXME
+	 * Compatibilité pixel bender / flash player 10
+	 */
+	public static function get DISSOLVE():Shader
+	{
+		return new BlendModeDissolve();
+	}
+	
+	/**
 	 * Similar to difference but with lower contrast
 	 */
 	public static function get EXCLUSION():Shader

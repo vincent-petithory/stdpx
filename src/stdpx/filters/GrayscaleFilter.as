@@ -1,30 +1,12 @@
 ﻿package stdpx.filters 
 {
 	import flash.display.Shader;
-	
+	import flash.display.ShaderData;
 	import flash.filters.BitmapFilter;
 	import flash.filters.ShaderFilter;
-	
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
 
-/** 
- * The GrayscaleFilter turns an image into levels of gray.
- * The image becomes monochromatic.
- * 
- * <p>There are several ways to turn an image into levels of gray : 
- * <ol>
- * 		<li>Using the V (Value) component of the HSV color model.</li>
- * 		<li>Using the L (Value) component of the HSL color model.</li>
- * 		<li>Using luminances.</li>
- * </ol>
- * <br/>
- * The GrayscaleFilter uses the third method. Luminances used for RGB are 
- * respectively 0.3086, 0.6094 and 0.0820.
- * </p>
- *
- */
-public class GrayscaleFilter extends ShaderFilter implements IMetadataAttachedShader 
+public class GrayscaleFilter extends ShaderFilter 
 {
 	
 	/**
@@ -35,23 +17,71 @@ public class GrayscaleFilter extends ShaderFilter implements IMetadataAttachedSh
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
 	
 	/**
-	 * Constructor.
-	 * 
-	 * @param intensity The strength of the grayscale effect. 
+	 * The metadata of the shader
 	 */
-	public function GrayscaleFilter(intensity:Number = 1) 
+	public function get metadata():ShaderMetadata
 	{
-		super();
-		this.shader = new Shader(new ShaderByteCode());
-		this.intensity = intensity;
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	public static function get minIntensity():Number
+	{
+		return shaderData.intensity.minValue[0];
+	}
+	
+	public static function get maxIntensity():Number
+	{
+		return shaderData.intensity.maxValue[0];
+	}
+	
+	public static function get defaultIntensity():Number
+	{
+		return shaderData.intensity.defaultValue[0];
 	}
 	
 	/**
-	 * The strength of the grayscale effect. 
-	 * Values are floating numbers between 0 and 1.
+	 * @private
+	 */
+	private static var _shaderData:ShaderData;
+	
+	/**
+	 * @private
+	 */
+	private static function get shaderData():ShaderData
+	{
+		if (!_shaderData)
+		{
+			_shaderData = new Shader(new ShaderByteCode()).data;
+		}
+		return _shaderData;
+	}
+	
+	/**
+	 * @private
+	 * A reference to the internal shader.
+	 */
+	private var _shader:Shader;
+	
+	public function GrayscaleFilter(intensity:Number = 1) 
+	{
+		super();
+		_shader = new Shader(new ShaderByteCode());
+		this.intensity = intensity;
+		this.shader = _shader;
+	}
+	
+	/**
+	 * 
 	 */
 	public function get intensity():Number
 	{
@@ -63,13 +93,10 @@ public class GrayscaleFilter extends ShaderFilter implements IMetadataAttachedSh
 	 */
 	public function set intensity(value:Number):void
 	{
-		this.shader.data.intensity.value[0] = value;
+		_shader.data.intensity.value[0] = Math.max(minIntensity,Math.min(value,maxIntensity));
+		this.shader = _shader;
 	}
 	
-	/**
-	 * Returns a clone of this filter.
-	 * @return a clone of this filter.
-	 */
 	override public function clone():BitmapFilter
 	{
 		return new GrayscaleFilter(intensity);

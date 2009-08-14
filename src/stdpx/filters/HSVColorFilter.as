@@ -23,31 +23,13 @@
 package stdpx.filters 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	
 	import flash.display.Shader;
-	
+	import flash.display.ShaderData;
+	import flash.display.ShaderParameter;
 	import flash.filters.BitmapFilter;
 	import flash.filters.ShaderFilter;
 
-/**
- * The HSVColorFilter allows you to change 
- * the hue, saturation and value of an image. 
- * 
- * <p>This is a common tool you find on all image manipulation softwares.<br/>
- * For a given pixel :
- * <ul>
- * 		<li>The hue is its general color, like red, blue, yellow, etc.</li>
- * 		<li>The saturation is the strength of the hue. Low values tends 
- * to pastel colors/gray. High values tends to vivid colors.</li>
- * 		<li>The value is its (non-linear) lightness. Low values tends to 
- * dark/black colors. High values tends to bright/white colors.
- * It is similar to the common lightness, but adapted to the eye non-linearity perception.</li>
- * </ul>
- * </p>
- * 
- */
-public class HSVColorFilter extends ShaderFilter implements IMetadataAttachedShader 
+public class HSVColorFilter extends ShaderFilter 
 {
 	
 	/**
@@ -58,30 +40,102 @@ public class HSVColorFilter extends ShaderFilter implements IMetadataAttachedSha
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
 	
 	/**
-	 * Constructor.
-	 *
-	 * @param hue The variation of hue to apply.
-	 * @param saturation The variation of saturation to apply.
-	 * @param value The variation of value to apply.
+	 * @private
 	 */
-	public function HSVColorFilter(hue:int = 0, saturation:int = 0, value:int = 0) 
+	private static var _shaderMetadata:ShaderMetadata;
+	
+	/**
+	 * The metadata of the shader
+	 */
+	public function get metadata():ShaderMetadata
 	{
-		super();
-		this.shader = new Shader(new ShaderByteCode());
-		this.hue = hue;
-		this.saturation = saturation;
-		this.value = value;
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	public static function get minHue():int
+	{
+		return shaderData.hue.minValue[0];
+	}
+	
+	public static function get maxHue():int
+	{
+		return shaderData.hue.maxValue[0];
+	}
+	
+	public static function get defaultHue():int
+	{
+		return shaderData.hue.defaultValue[0];
+	}
+	
+	public static function get minSaturation():int
+	{
+		return shaderData.saturation.minValue[0];
+	}
+	
+	public static function get maxSaturation():int
+	{
+		return shaderData.saturation.maxValue[0];
+	}
+	
+	public static function get defaultSaturation():int
+	{
+		return shaderData.saturation.defaultValue[0];
+	}
+	
+	public static function get minValue():int
+	{
+		return shaderData.value.minValue[0];
+	}
+	
+	public static function get maxValue():int
+	{
+		return shaderData.value.maxValue[0];
+	}
+	
+	public static function get defaultValue():int
+	{
+		return shaderData.value.defaultValue[0];
 	}
 	
 	/**
-	 * The variation of hue to apply. 
-	 * Typical values are between -180 and 180.
-	 * A value of 0 does not 
-	 * modify the hue of the image.
+	 * @private
 	 */
+	private static var _shaderData:ShaderData;
+	
+	/**
+	 * @private
+	 */
+	private static function get shaderData():ShaderData
+	{
+		if (!_shaderData)
+		{
+			_shaderData = new Shader(new ShaderByteCode()).data;
+		}
+		return _shaderData;
+	}
+	
+	/**
+	 * @private
+	 * A reference to the internal shader.
+	 */
+	private var _shader:Shader;
+	
+	public function HSVColorFilter(hue:int = 0, saturation:int = 0, value:int = 0) 
+	{
+		super();
+		_shader = new Shader(new ShaderByteCode());
+		this.hue = hue;
+		this.saturation = saturation;
+		this.value = value;
+		this.shader = _shader;
+	}
+	
 	public function get hue():int
 	{
 		return this.shader.data.hue.value[0];
@@ -92,15 +146,10 @@ public class HSVColorFilter extends ShaderFilter implements IMetadataAttachedSha
 	 */
 	public function set hue(value:int):void
 	{
-		this.shader.data.hue.value[0] = value;
+		_shader.data.hue.value[0] = Math.max(minHue, Math.min(maxHue, value));
+		this.shader = _shader;
 	}
 	
-	/**
-	 * The variation of saturation to apply. 
-	 * Typical values are between -100 and 100.
-	 * A value of 0 does not 
-	 * modify the saturation of the image.
-	 */
 	public function get saturation():int
 	{
 		return this.shader.data.saturation.value[0];
@@ -111,15 +160,10 @@ public class HSVColorFilter extends ShaderFilter implements IMetadataAttachedSha
 	 */
 	public function set saturation(value:int):void
 	{
-		this.shader.data.saturation.value[0] = value;
+		_shader.data.saturation.value[0] = Math.max(minSaturation, Math.min(maxSaturation, value));
+		this.shader = _shader;
 	}
 	
-	/**
-	 * The variation of value to apply. 
-	 * Typical values are between -180 and 180.
-	 * A value of 0 does not 
-	 * modify the hue of the image.
-	 */
 	public function get value():int
 	{
 		return this.shader.data.value.value[0];
@@ -130,13 +174,10 @@ public class HSVColorFilter extends ShaderFilter implements IMetadataAttachedSha
 	 */
 	public function set value(value:int):void
 	{
-		this.shader.data.value.value[0] = value;
+		_shader.data.value.value[0] = Math.max(minValue, Math.min(maxValue, value));
+		this.shader = _shader;
 	}
 	
-	/**
-	 * Returns a clone of this filter.
-	 * @return a clone of this filter.
-	 */
 	override public function clone():BitmapFilter
 	{
 		return new HSVColorFilter(hue,saturation,value);

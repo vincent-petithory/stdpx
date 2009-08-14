@@ -23,65 +23,10 @@
 package stdpx.jobs 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
 	import flash.display.Shader;
 	import flash.display.ShaderData;
 
-/**
- * The <code class="prettyprint">HSVColorJob</code> produces 
- * colors in the HSV color space.
- * 
- * <p>A HSV based color has three parameters : 
- * <ul>
- * 		<li>hue; values are integers in [0,360]</li>
- * 		<li>saturation; values are integers in [0,100]</li>
- * 		<li>value; values are integers in [0,100]</li>
- * </ul>
- * Vectors or ByteArrays you provide as input must contain sets of three values.
- * </p>
- * 
- * <strong>Example :</strong>
- * <pre class="prettyprint">
- * * The following examples generates 360 random colors in the HSV Space,
- * then draws them in a Shape object. The input is a ByteArray.
- * 
- * var byteColors:ByteArray = new ByteArray();
- * byteColors.endian = Endian.LITTLE_ENDIAN;
- * 
- * const NUM_COLORS:int = 360;
- * 
- * var i:int = 0;
- * while (i<NUM_COLORS)
- * {
- * 	// sets hue
- * 	byteColors.writeFloat(i);
- * 	// sets saturation
- * 	byteColors.writeFloat(100);
- * 	// sets value
- * 	byteColors.writeFloat(100);
- * 	i++;
- * }
- * 
- * var job:HSVColorJob = new HSVColorJob();
- * job.byteArray = byteColors;
- * // calculation is done synchronously.
- * job.start(true);
- * 
- * var colors:Vector.<uint> = job.getColors();
- * 
- * var shape:Shape = new Shape();
- * addChild(shape);
- * var j:int = 0;
- * for each (var color:uint in colors)
- * {
- * 	shape.graphics.beginFill(color);
- * 	shape.graphics.drawRect(j,0,1,200);
- * 	shape.graphics.endFill();
- * 	j++;
- * }
- * </pre>
- */
-public class HSVColorJob extends BaseColorJob implements IMetadataAttachedShader 
+public class HSVColorJob extends BaseColorJob 
 {
 	
 	/**
@@ -92,11 +37,40 @@ public class HSVColorJob extends BaseColorJob implements IMetadataAttachedShader
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
 	
 	/**
-	 * Constructor.
+	 * The metadata of the shader
 	 */
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	/**
+	 * @private
+	 */
+	private static var _shaderData:ShaderData;
+	
+	/**
+	 * @private
+	 */
+	private static function get shaderData():ShaderData
+	{
+		if (!_shaderData)
+		{
+			_shaderData = new Shader(new ShaderByteCode()).data;
+		}
+		return _shaderData;
+	}
+	
 	public function HSVColorJob() 
 	{
 		super(new ShaderByteCode(),3);

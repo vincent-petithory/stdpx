@@ -23,26 +23,14 @@
 package stdpx.filters 
 {
 	import stdpx.types.ShaderMetadata;
-	import stdpx.types.IMetadataAttachedShader;
-	
 	import flash.display.BitmapData;
-	
 	import flash.display.Shader;
+	import flash.display.ShaderData;
 	
 	import flash.filters.BitmapFilter;
 	import flash.filters.ShaderFilter;
 
-/**
- * The LayerMaskFilter takes a mask and applies it to the image.
- * 
- * <p>A black pixel of the mask causes the corresponding pixel of the image to be transparent.<br/>
- * A white pixel of the mask causes the corresponding pixel of the image to be opaque.<br/>
- * A gray pixel of the mask causes a part-transparent pixel in the image.</p>
- * 
- * This technique is commonly knowed as layer masking.
- * 
- */
-public class LayerMaskFilter extends ShaderFilter implements IMetadataAttachedShader 
+public class LayerMaskFilter extends ShaderFilter 
 {
 	
 	/**
@@ -53,52 +41,60 @@ public class LayerMaskFilter extends ShaderFilter implements IMetadataAttachedSh
 			mimeType="application/octet-stream")]
 	private static var ShaderByteCode:Class;
 	
-	include "../types/metadata.as";
+	/**
+	 * @private
+	 */
+	private static var _shaderMetadata:ShaderMetadata;
 	
 	/**
-	 * Constructor.
-	 * 
-	 * @param mask The mask to apply.
+	 * The metadata of the shader
 	 */
-	public function LayerMaskFilter(mask:BitmapData = null) 
+	public function get metadata():ShaderMetadata
+	{
+		if (!_shaderMetadata)
+		{
+			_shaderMetadata = new ShaderMetadata(new ShaderByteCode());
+		}
+		return _shaderMetadata;
+	}
+	
+	/**
+	 * @private
+	 */
+	private static var _shaderData:ShaderData;
+	
+	/**
+	 * @private
+	 */
+	private static function get shaderData():ShaderData
+	{
+		if (!_shaderData)
+		{
+			_shaderData = new Shader(new ShaderByteCode()).data;
+		}
+		return _shaderData;
+	}
+	
+	private var _mask:BitmapData;
+	
+	public function LayerMaskFilter(mask:BitmapData) 
 	{
 		super();
 		this.shader = new Shader(new ShaderByteCode());
 		this.mask = mask;
 	}
 	
-	/**
-	 * @private
-	 */
-	private var _mask:BitmapData;
-	
-	/**
-	 * The mask to apply. 
-	 * A black pixel of the mask causes the corresponding pixel of the image to be transparent.
-	 * A white pixel of the mask causes the corresponding pixel of the image to be opaque.
-	 * A gray pixel of the mask causes a part-transparent pixel in the image.
-	 */
 	public function get mask():BitmapData
 	{
 		return _mask;
 	}
 	
-	/**
-	 * @private
-	 */
 	public function set mask(value:BitmapData):void
 	{
-		if (value)
-		{
-			this._mask = value.clone();
-			this.shader.data.mask.input = _mask;
-		}
+		this._mask = value.clone();
+		this.shader.data.mergeMask.input = _mask;
 	}
 	
-	/**
-	 * Returns a clone of this filter.
-	 * @return a clone of this filter.
-	 */
 	override public function clone():BitmapFilter
 	{
 		return new LayerMaskFilter(_mask);

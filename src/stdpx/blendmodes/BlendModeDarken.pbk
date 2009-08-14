@@ -24,7 +24,7 @@
 
 kernel BlendModeDarken
 <   
-    namespace : "http://www.lunar-dev.net/2009/stdpx/blendmodes";
+    namespace : "http://blog.lunar-dev.net::BlendModes";
     vendor : "Vincent Petithory";
     version : 1;
     description : "Merges two images using the Darken blend mode.";

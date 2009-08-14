@@ -24,12 +24,11 @@ package stdpx.types
 {
 	import flash.display.Shader;
 	import flash.display.ShaderData;
-	import flash.display.ShaderParameter;
 	import flash.utils.ByteArray;
 
 /**
  * A <code class="prettyprint">ShaderMetadata</code> holds metadata 
- * defined in the source code of a shader.
+ * defined in the source code of shader byte code.
  */
 public class ShaderMetadata 
 {
@@ -40,55 +39,53 @@ public class ShaderMetadata
 	private var shaderData:ShaderData;
 	
 	/**
-	 * @private
-	 */
-	private var projectMetadata:BasicProjectMetadata;
-	
-	
-	/**
 	 * Constructor.
-	 * @param byteCode The byteCode of the shader whose metadata will be stored.
+	 * @param byteCode The byteCode of a shader, whose metadata will be stored.
 	 */
 	public function ShaderMetadata(byteCode:ByteArray) 
 	{
 		super();
 		this.shaderData = new Shader(byteCode).data;
-		this.projectMetadata = new BasicProjectMetadata();
-		this.projectMetadata.description = this.shaderData.description;
-		this.projectMetadata.version = this.shaderData.version;
-		this.projectMetadata.name = this.shaderData.name;
-		this.projectMetadata.ns = this.shaderData.namespace;
-		this.projectMetadata.vendor = this.shaderData.vendor;
-	}
-	
-	public function get general():BasicProjectMetadata
-	{
-		return this.projectMetadata;
 	}
 	
 	/**
-	* @private
-	*/
-	private var _parameters:Vector.<ShaderParameter>;
-	
-	/**
-	 * The list of parameters of the shader, as they are defined in the shader source.
+	 * The description of the shader, as it is defined in the shader source.
 	 */
-	public function get parameters():Vector.<ShaderParameter>
+	public function get description():String
 	{
-		if (!_parameters)
-		{
-			_parameters = new Vector.<ShaderParameter>();
-			for (var name:String in shaderData)
-			{
-				if (shaderData[name] is ShaderParameter)
-				{
-					_parameters.push(shaderData[name]);
-				}
-			}
-			
-		}
-		return _parameters;
+		return this.shaderData.description;
+	}
+	
+	/**
+	 * The version of the shader, as it is defined in the shader source.
+	 */
+	public function get version():String
+	{
+		return String(this.shaderData.version);
+	}
+	
+	/**
+	 * The name of the shader, as it is defined in the shader source.
+	 */
+	public function get name():String
+	{
+		return this.shaderData.name;
+	}
+	
+	/**
+	 * The namespace of the shader, as it is defined in the shader source.
+	 */
+	public function get namespace():String
+	{
+		return this.shaderData.namespace;
+	}
+	
+	/**
+	 * The vendor of the shader, as it is defined in the shader source.
+	 */
+	public function get vendor():String
+	{
+		return this.shaderData.vendor;
 	}
 	
 	/**
@@ -99,16 +96,7 @@ public class ShaderMetadata
 	 */
 	public function toString():String
 	{
-		return general.name+" version "+general.version+" by "+general.vendor;
-	}
-	
-	/**
-	* Returns the shader data of the described shader.
-	* @return the shader data of the described shader.
-	*/
-	public function valueOf():ShaderData
-	{
-		return this.shaderData;
+		return name+" version "+version+" by "+vendor;
 	}
 	
 }

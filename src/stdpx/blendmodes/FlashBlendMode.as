@@ -24,7 +24,7 @@ package stdpx.blendmodes
 {
 	import flash.display.Shader;
 
-public final class FlashBlendMode 
+public class FlashBlendMode 
 {
 	
 	

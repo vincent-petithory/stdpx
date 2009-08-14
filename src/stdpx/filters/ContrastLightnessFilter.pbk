@@ -24,7 +24,7 @@
 
 kernel ContrastLightnessFilter
 <
-    namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+    namespace : "http://blog.lunar-dev.net::Filters";
     vendor : "Vincent Petithory";
     version : 1;
     description : "A filter to adjust the contrast and lightness of an image";
@@ -38,7 +38,6 @@ kernel ContrastLightnessFilter
         defaultValue:   0.0;
         minValue:       -100.0;
         maxValue:       100.0;
-        description: "The constrast of the image";
     >;
     
     parameter float lightness
@@ -46,7 +45,6 @@ kernel ContrastLightnessFilter
         defaultValue:   0.0;
         minValue:       -100.0;
         maxValue:       100.0;
-        description: "The lightness of the image";
     >;
     
     void evaluatePixel()

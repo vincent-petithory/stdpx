@@ -24,7 +24,7 @@
 
 kernel HSVColorFilter
 <
-    namespace : "http://www.lunar-dev.net/2009/stdpx/filters";
+    namespace : "http://blog.lunar-dev.net::Filters";
     vendor : "Vincent Petithory";
     version : 1;
     description : "A filter to adjust hue, saturation and value of an image";
@@ -38,7 +38,6 @@ kernel HSVColorFilter
         defaultValue:   0.0;
         minValue:       -180.0;
         maxValue:       180.0;
-        description: "The variation of hue";
     >;
     
     parameter float saturation
@@ -46,7 +45,6 @@ kernel HSVColorFilter
         defaultValue:   0.0;
         minValue:       -100.0;
         maxValue:       100.0;
-        description: "The variation of saturation";
     >;
     
     parameter float value
@@ -54,7 +52,6 @@ kernel HSVColorFilter
         defaultValue:   0.0;
         minValue:       -100.0;
         maxValue:       100.0;
-        description: "The variation of value";
     >;
 
     void evaluatePixel()
