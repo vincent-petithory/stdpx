@@ -1,0 +1,13 @@
+# .gitignore for stdpx
+
+# os files
+*.db
+.DS_Store
+
+# docs and others
+*.pdf
+*.ai
+*.psd
+
+# outputs
+*.swc
