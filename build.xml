@@ -20,6 +20,33 @@
 		description="Cleans all" 
 	/>
 	
+	<!-- pack -->
+	
+	<target name="clean.pack">
+		<delete>
+			<fileset dir="${lib.output.dir}" includes="**/stdpx*.zip" excludes="**/asdoc-stdpx.*.zip" />
+		</delete>
+    </target>
+	
+	<target name="pack" depends="clean.pack, build.get">
+		<!-- zip -->
+		<loadresource property="project.archive">
+			<propertyresource name="project.archive.pattern" />
+			<filterchain>
+				<replacetokens>
+					<token key="BUILD" value="${project.build.number}"/>
+				</replacetokens>
+			</filterchain>
+		</loadresource>
+		
+		<zip destfile="${project.archive}">
+			<zipfileset dir="${asdoc.dir}" prefix="asdoc" />
+			<zipfileset dir="${lib.output.dir}" includes="*.swc" />
+			<zipfileset dir="${lib.output.dir}" includes="${project.readme}" />
+			<zipfileset dir="${lib.output.dir}" includes="LICENSE" />
+		</zip>
+	</target>
+	
 	<!-- kernels -->
 	
 	<target name="clean.kernels">
@@ -69,7 +96,8 @@
 			<arg value="-target-player=10" />
 			<arg value="-o ${project.out}" />
 		</compc>
-		<copy file="${project.root}/License.txt" toDir="${lib.output.dir}" />
+		<copy file="${project.root}/${project.license}" toDir="${lib.output.dir}" />
+		<copy file="${project.root}/${project.readme}" toDir="${lib.output.dir}" />
     </target>
 	
 	<!-- asdoc -->
@@ -77,7 +105,7 @@
 	<target name="clean.asdoc">
 		<delete dir="${asdoc.dir}" />
 		<delete>
-			<fileset dir="${lib.output.dir}" includes="**/*.zip" />
+			<fileset dir="${lib.output.dir}" includes="**/asdoc-stdpx*.zip" />
 		</delete>
     </target>
 	
