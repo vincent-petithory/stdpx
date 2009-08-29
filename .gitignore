@@ -11,3 +11,12 @@
 
 # outputs
 *.swc
+
+# unwanted folders
+asdoc
+docs
+lab
+lib
+samples
+trash
+wiki
